@@ -1,0 +1,37 @@
+name: Node Github CI/CD
+
+on:
+   push:
+      branches: 
+         - develop
+
+jobs:
+   test:
+
+      runs-on: mac
+
+      strategy:
+         matrix:
+            node-version: [16.x, 19.x]
+      steps:
+         - uses: actions/checkout@v2
+         - name: Use Node.js ${{ matrix.node-version }}
+           uses: actions/set-up@v1
+           with:
+              node-version: ${{ matrix.node-version }}
+         - name: yarn install and test
+           run:  |
+             yarn install
+             yarn test
+           env:
+             CI: true
+
+   deploy:
+      runs-on: mac
+
+      steps:
+         - uses: actions/checkout@v2
+         - run: docker build -t izustic/todo-sq014 .
+         - run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+         - run: docker push izustic/todo-sq014
+            
