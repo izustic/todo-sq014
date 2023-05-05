@@ -19,19 +19,12 @@ jobs:
            uses: actions/set-up@v1
            with:
               node-version: ${{ matrix.node-version }}
-         - name: yarn install and test
+         - name: yarn add and test
            run:  |
-             yarn install
+             yarn add
              yarn test
            env:
              CI: true
 
-   deploy:
-      runs-on: mac
 
-      steps:
-         - uses: actions/checkout@v2
-         - run: docker build -t izustic/todo-sq014 .
-         - run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-         - run: docker push izustic/todo-sq014
             
