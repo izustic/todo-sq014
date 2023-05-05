@@ -1,0 +1,35 @@
+name: Node Github CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+   test:
+
+     runs-on: ubuntu-latest
+
+     strategy:
+       matrix:
+         node-version: [16.x, 18.x]
+     steps:
+       - uses: actions/checkout@v2
+       - name: Use Node.js ${{ matrix.node-version }}
+         uses: actions/setup-node@v1
+         with: 
+           node-version: ${{ matrix.node-version }}
+           cache: 'yarn'
+       - run: yarn install
+       - run: yarn test
+         env: 
+          CI: true
+
+   deploy: 
+     runs-on: ubuntu-latest
+
+     steps:
+       - uses: actions/checkout@v2
+       - run: docker build -t aksheg/todo .
+       - run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+       - run: docker push aksheg/todo
